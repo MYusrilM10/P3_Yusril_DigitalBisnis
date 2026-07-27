@@ -12,6 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="/assets/logo.ico">
+    <link rel="apple-touch-icon" href="/assets/logo.webp">
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -19,19 +24,29 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 flex min-h-screen">
+<body class="bg-slate-50 text-slate-900" x-data="{ sidebarOpen: false }">
+
+    <div class="flex min-h-screen">
+
+    <!-- Sidebar backdrop (mobile only) -->
+    <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-40 md:hidden" style="display: none;"></div>
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-indigo-900 text-indigo-100 flex flex-col p-6 space-y-8 sticky top-0 h-screen">
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="w-64 bg-indigo-900 text-indigo-100 flex flex-col p-6 space-y-8 fixed md:sticky top-0 h-screen z-50 transition-transform duration-200 md:translate-x-0">
 
         <!-- Logo -->
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-900 font-bold text-xl">
-                AH
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0">
+                    <img src="/assets/logo.webp" alt="AmikomEventHub" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl font-bold text-white tracking-tight truncate">
+                    AmikomEventHub
+                </span>
             </div>
-            <span class="text-xl font-bold text-white tracking-tight">
-                AmikomEventHub
-            </span>
+            <button @click="sidebarOpen = false" class="md:hidden text-indigo-200 hover:text-white shrink-0">
+                <i class="fa-solid fa-xmark w-5 h-5"></i>
+            </button>
         </div>
 
         <!-- Menu -->
@@ -134,15 +149,37 @@
 
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-10 overflow-y-auto">
+    <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- Konten -->
-        @yield('content')
+        <!-- Mobile Top Bar -->
+        <div class="md:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+            <button @click="sidebarOpen = true" class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <span class="font-bold text-slate-800">Admin Panel</span>
+        </div>
 
-    </main>
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-10 overflow-y-auto min-w-0">
+
+            <!-- Konten -->
+            @yield('content')
+
+        </main>
+
+    </div>
+
+    </div>
 
     @stack('scripts')
+
+    @include('partials.pwa-install-banner')
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+        }
+    </script>
 
 </body>
 

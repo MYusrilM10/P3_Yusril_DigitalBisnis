@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - AmikomEventHub</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        .card {
+            text-align: center;
+            padding: 2.5rem;
+            max-width: 24rem;
+        }
+        .badge {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1.5rem;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+        p { color: #64748b; margin: 0 0 1.5rem; }
+        button {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge"><img src="/assets/logo.webp" alt="AmikomEventHub"></div>
+        <h1>Kamu sedang offline</h1>
+        <p>Halaman ini butuh koneksi internet. Cek koneksimu lalu coba lagi.</p>
+        <button onclick="location.reload()">Coba Lagi</button>
+    </div>
+</body>
+</html>

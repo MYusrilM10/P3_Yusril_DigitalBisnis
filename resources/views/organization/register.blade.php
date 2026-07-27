@@ -2,28 +2,29 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto px-6 py-20">
-    <div class="text-center mb-12">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-3xl mb-6">
-            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
+    <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
+
+        <!-- Logo & Title -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 overflow-hidden">
+                <img src="/assets/logo.webp" alt="AmikomEventHub" class="w-full h-full object-cover">
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-3">Daftar Jadi Penyelenggara</h1>
+            <p class="text-slate-500 text-lg">Buat akun kepanitiaan dan kelola event organisasi Anda di AmikomEventHub</p>
         </div>
-        <h1 class="text-4xl font-extrabold text-slate-900 mb-3">Daftar Jadi Penyelenggara</h1>
-        <p class="text-slate-500 text-lg">Buat akun kepanitiaan dan kelola event organisasi Anda di AmikomEventHub</p>
-    </div>
 
-    @if($errors->any())
-    <div class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
-        <p class="text-red-700 font-bold mb-2">Terdapat kesalahan:</p>
-        <ul class="list-disc list-inside text-red-600 text-sm">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
+        @if($errors->any())
+        <div class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+            <p class="text-red-700 font-bold mb-2">Terdapat kesalahan:</p>
+            <ul class="list-disc list-inside text-red-600 text-sm">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
 
-    <form action="{{ route('organization.register.submit') }}" method="POST" class="bg-white rounded-3xl shadow-xl p-8 md:p-10 space-y-6">
+        <form action="{{ route('organization.register.submit') }}" method="POST" class="space-y-6">
         @csrf
 
         <div class="border-b border-slate-200 pb-4">
@@ -111,6 +112,7 @@
                 </a>
             </p>
         </div>
-    </form>
+        </form>
+    </div>
 </div>
 @endsection

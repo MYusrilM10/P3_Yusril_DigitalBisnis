@@ -39,8 +39,8 @@
             <!-- Logo & Title -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-3 mb-4 justify-center">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
-                        AH
+                    <div class="w-12 h-12 rounded-2xl overflow-hidden">
+                        <img src="/assets/logo.webp" alt="AmikomEventHub" class="w-full h-full object-cover">
                     </div>
                     <span class="text-2xl font-bold tracking-tight text-indigo-900">AmikomEventHub</span>
                 </div>

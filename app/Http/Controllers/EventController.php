@@ -7,6 +7,7 @@ class EventController extends Controller
     public function show(\App\Models\Event $event)
     {
         $categories = \App\Models\Category::all();
+        $event->load('organization');
 
         return view('event-detail', compact('categories', 'event'));
     }

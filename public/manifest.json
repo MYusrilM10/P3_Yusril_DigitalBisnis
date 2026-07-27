@@ -1,0 +1,14 @@
+{
+  "name": "AmikomEventHub",
+  "short_name": "AmikomEventHub",
+  "description": "Temukan dan kelola event kampus Amikom",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/assets/logo.webp", "sizes": "578x578", "type": "image/webp", "purpose": "any" },
+    { "src": "/assets/logo.webp", "sizes": "578x578", "type": "image/webp", "purpose": "maskable" }
+  ]
+}

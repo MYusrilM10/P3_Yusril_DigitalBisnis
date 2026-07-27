@@ -20,12 +20,20 @@ class PlatformDummySeeder extends Seeder
         $superadmin = User::where('email', 'superadmin@amikom.ac.id')->first();
 
         // ============ USERS: Biasa + Panitia Tambahan ============
+        $regularUserNames = [
+            'Ahmad Fauzi Rahman',
+            'Siti Nur Azizah',
+            'Bagus Prasetyo',
+            'Rina Marlina',
+            'Dimas Adi Nugroho',
+        ];
         $regularUsers = [];
-        for ($i = 1; $i <= 5; $i++) {
+        foreach ($regularUserNames as $i => $name) {
+            $i++;
             $user = User::firstOrCreate(
                 ['email' => "user{$i}@example.com"],
                 [
-                    'name' => "User Demo {$i}",
+                    'name' => $name,
                     'password' => bcrypt('password'),
                     'role' => 'user',
                 ]
@@ -34,12 +42,18 @@ class PlatformDummySeeder extends Seeder
         }
 
         // Panitia tambahan untuk org lain
+        $panitiaUserNames = [
+            'Andi Setiawan',
+            'Maya Kusuma Wardani',
+            'Reza Firmansyah',
+        ];
         $panitiaUsers = [];
-        for ($i = 1; $i <= 3; $i++) {
+        foreach ($panitiaUserNames as $i => $name) {
+            $i++;
             $user = User::firstOrCreate(
                 ['email' => "panitia{$i}@amikom.ac.id"],
                 [
-                    'name' => "Panitia Demo {$i}",
+                    'name' => $name,
                     'password' => bcrypt('password'),
                     'role' => 'panitia',
                 ]
@@ -52,20 +66,25 @@ class PlatformDummySeeder extends Seeder
         $organizations = Organization::all();
 
         // Bikin org pending (belum approve) jika belum ada
+        $pendingOrgDefs = [
+            ['slug' => 'ukm-fotografi', 'name' => 'UKM Fotografi Amikom', 'desc' => 'Unit Kegiatan Mahasiswa Fotografi Universitas Amikom Yogyakarta.'],
+            ['slug' => 'komunitas-robotika', 'name' => 'Komunitas Robotika Amikom', 'desc' => 'Komunitas mahasiswa yang bergerak di bidang robotika dan IoT.'],
+        ];
         $pendingOrgs = [];
-        for ($i = 1; $i <= 2; $i++) {
+        foreach ($pendingOrgDefs as $i => $def) {
+            $i++;
             $org = Organization::firstOrCreate(
-                ['slug' => "demo-org-pending-{$i}"],
+                ['slug' => $def['slug']],
                 [
-                    'name' => "Demo Organization Pending {$i}",
+                    'name' => $def['name'],
                     'type' => 'ukm',
-                    'description' => "Ini adalah organisasi demo yang masih pending approval.",
-                    'email' => "demo-org-pending-{$i}@amikom.ac.id",
+                    'description' => $def['desc'],
+                    'email' => "{$def['slug']}@amikom.ac.id",
                     'phone' => "081234567{$i}00",
                     'address' => "Kampus Amikom Yogyakarta",
                     'status' => 'pending',
                     'commission_percentage' => 10.00 + $i,
-                    'bank_account_name' => "Demo Org Pending {$i}",
+                    'bank_account_name' => $def['name'],
                     'bank_account_number' => "123456789{$i}",
                     'bank_name' => 'BCA',
                 ]
@@ -83,22 +102,27 @@ class PlatformDummySeeder extends Seeder
         }
 
         // Bikin org active dengan approval
+        $activeOrgDefs = [
+            ['slug' => 'panitia-amikom-festival', 'name' => 'Panitia Amikom Festival', 'desc' => 'Panitia penyelenggara Amikom Festival, acara tahunan kampus.'],
+            ['slug' => 'panitia-wisuda-amikom', 'name' => 'Panitia Wisuda Amikom', 'desc' => 'Panitia penyelenggara acara wisuda dan seremoni kampus.'],
+        ];
         $activeOrgs = [];
-        for ($i = 1; $i <= 2; $i++) {
+        foreach ($activeOrgDefs as $i => $def) {
+            $i++;
             $org = Organization::firstOrCreate(
-                ['slug' => "demo-org-active-{$i}"],
+                ['slug' => $def['slug']],
                 [
-                    'name' => "Demo Organization Active {$i}",
+                    'name' => $def['name'],
                     'type' => 'kepanitiaan',
-                    'description' => "Ini adalah organisasi demo yang sudah disetujui.",
-                    'email' => "demo-org-active-{$i}@amikom.ac.id",
+                    'description' => $def['desc'],
+                    'email' => "{$def['slug']}@amikom.ac.id",
                     'phone' => "081234567{$i}11",
                     'address' => "Kampus Amikom Yogyakarta",
                     'status' => 'active',
                     'commission_percentage' => 12.00 + $i,
                     'approved_at' => now()->subDays(10),
                     'approved_by' => $admin->id,
-                    'bank_account_name' => "Demo Org Active {$i}",
+                    'bank_account_name' => $def['name'],
                     'bank_account_number' => "987654321{$i}",
                     'bank_name' => 'Mandiri',
                 ]
@@ -117,25 +141,38 @@ class PlatformDummySeeder extends Seeder
         }
 
         // ============ EVENTS ============
+        $eventNamePool = [
+            'Seminar Nasional Teknologi Digital',
+            'Workshop Desain UI/UX',
+            'Talkshow Karir & Dunia Kerja',
+            'Kompetisi Coding Antar Mahasiswa',
+            'Konser Amal Kampus',
+            'Festival Musik Kampus',
+            'Bazaar UMKM Kampus',
+            'Turnamen E-Sport Kampus',
+            'Pelatihan Public Speaking',
+            'Pameran Karya Mahasiswa',
+        ];
         $allEvents = [];
 
         // Events dari active organizations
         foreach ($activeOrgs as $idx => $org) {
             for ($i = 1; $i <= 3; $i++) {
                 $category = $categories->random();
+                $eventName = $eventNamePool[array_rand($eventNamePool)];
                 $event = Event::firstOrCreate(
                     [
                         'organization_id' => $org->id,
-                        'title' => "{$org->name} - Event Demo {$i}",
+                        'title' => "{$eventName} - {$org->name}",
                     ],
                     [
                         'category_id' => $category->id,
-                        'description' => "Event demo dari {$org->name}. Deskripsi event yang menarik untuk ditonton.",
+                        'description' => "{$eventName} yang diselenggarakan oleh {$org->name}. Acara ini terbuka untuk seluruh mahasiswa Amikom.",
                         'date' => now()->addDays(rand(5, 30)),
                         'location' => "Ruang Amikom Yogyakarta - {$i}",
                         'price' => rand(30000, 150000),
                         'stock' => rand(50, 200),
-                        'poster_path' => "posters/demo-event-{$org->id}-{$i}.png",
+                        'poster_path' => "posters/event-{$org->id}-{$i}.png",
                     ]
                 );
                 $allEvents[] = $event;
@@ -146,14 +183,15 @@ class PlatformDummySeeder extends Seeder
         foreach ($organizations->where('status', 'active')->take(2) as $org) {
             for ($i = 1; $i <= 2; $i++) {
                 $category = $categories->random();
+                $eventName = $eventNamePool[array_rand($eventNamePool)];
                 $event = Event::firstOrCreate(
                     [
                         'organization_id' => $org->id,
-                        'title' => "{$org->name} - Extra Event {$i}",
+                        'title' => "{$eventName} - {$org->name}",
                     ],
                     [
                         'category_id' => $category->id,
-                        'description' => "Event tambahan dari {$org->name}.",
+                        'description' => "{$eventName} yang diselenggarakan oleh {$org->name}.",
                         'date' => now()->addDays(rand(1, 20)),
                         'location' => "Ruang Utama Amikom",
                         'price' => rand(40000, 120000),

@@ -25,7 +25,7 @@ class HomeController extends Controller
             });
         }
 
-        $events = $query->get();
+        $events = $query->paginate(12)->withQueryString();
         $partners = Partner::all();
         $organizations = Organization::where('status', 'active')
             ->withCount('events')

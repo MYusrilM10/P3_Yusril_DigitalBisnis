@@ -10,12 +10,20 @@
                 <div class="mt-8 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
                     <h4 class="font-bold mb-4">Penyelenggara</h4>
                     <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-                            AB</div>
+                        @if($event->organization?->logo_path)
+                            <img src="{{ asset('storage/' . $event->organization->logo_path) }}"
+                                 alt="{{ $event->organization->name }}"
+                                 class="w-12 h-12 rounded-full object-cover">
+                        @else
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                                {{ strtoupper(substr($event->organization->name ?? 'AmikomEventHub', 0, 2)) }}
+                            </div>
+                        @endif
                         <div>
-                            <p class="font-bold text-slate-800">ABP Productions</p>
-                            <p class="text-xs text-slate-500">Verified Organizer</p>
+                            <p class="font-bold text-slate-800">{{ $event->organization->name ?? 'AmikomEventHub' }}</p>
+                            <p class="text-xs text-slate-500">
+                                {{ $event->organization && $event->organization->status === 'active' ? 'Verified Organizer' : 'Penyelenggara' }}
+                            </p>
                         </div>
                     </div>
                 </div>

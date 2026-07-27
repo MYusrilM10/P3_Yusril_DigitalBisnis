@@ -89,6 +89,9 @@ Route::get('/panitia/{slug}', [App\Http\Controllers\PublicOrganizationController
 // Global logout (untuk semua role)
 Route::post('/logout', [SmartLoginController::class, 'logout'])->name('logout');
 
+Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.post');
+
 Route::prefix('panitia/{slug}')->name('panitia.')->group(function () {
     // Logout (any user)
     Route::post('/logout', [OrgAuthController::class, 'logout'])->name('logout');

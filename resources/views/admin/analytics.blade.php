@@ -104,35 +104,277 @@
             </div>
         </div>
 
-        <!-- 30 Hari -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider w-32">Tanggal</th>
-                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Revenue 30 Hari</th>
-                            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($last30days as $row)
-                        <tr class="hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 transition-colors duration-200 group">
-                            <td class="px-6 py-4 text-gray-500 font-semibold text-sm">{{ \Carbon\Carbon::parse($row->date)->format('d M Y') }}</td>
-                            <td class="px-6 py-4">
-                                <div class="bg-slate-100 rounded-full h-5 relative overflow-hidden">
-                                    <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 h-5 rounded-full" style="width: {{ min(100, $row->revenue / 100000) }}%"></div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right text-gray-800 font-semibold text-sm">Rp {{ number_format($row->revenue, 0, ',', '.') }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="3" class="px-6 py-12 text-center text-gray-500 font-medium">Belum ada data</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Pertumbuhan Pengguna (30 Hari)</h3>
+                </div>
+                <div id="userGrowthChart" style="min-height: 400px;"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Pertumbuhan Event (30 Hari)</h3>
+                </div>
+                <div id="eventGrowthChart" style="min-height: 400px;"></div>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    window.addEventListener('load', function() {
+        renderAnalyticsCharts();
+    });
+
+    function renderAnalyticsCharts() {
+        const labels = @json($growthLabels ?? []);
+        const userGrowthData = @json($userGrowth ?? []);
+        const eventGrowthData = @json($eventGrowth ?? []);
+
+        console.log('Analytics Chart Data:', { labels, userGrowthData, eventGrowthData });
+
+        if (!labels || labels.length === 0 || !userGrowthData || !eventGrowthData) {
+            console.error('Analytics chart data is missing or empty');
+            return;
+        }
+
+        if (typeof ApexCharts === 'undefined') {
+            console.error('ApexCharts library not loaded');
+            return;
+        }
+
+        const userChartEl = document.getElementById('userGrowthChart');
+        const eventChartEl = document.getElementById('eventGrowthChart');
+
+        if (!userChartEl || !eventChartEl) {
+            console.error('Chart containers not found');
+            return;
+        }
+
+        try {
+            // User Growth Chart
+            const userChartOptions = {
+                series: [{
+                    name: 'User Baru',
+                    data: userGrowthData,
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    toolbar: {
+                        show: true,
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        dataLabels: {
+                            position: 'top',
+                        },
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val) {
+                        return Math.round(val);
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#4f46e5'],
+                        fontWeight: 600,
+                    },
+                },
+                colors: ['#4f46e5'],
+                xaxis: {
+                    categories: labels,
+                    position: 'bottom',
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false,
+                    },
+                    crosshairs: {
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                colorFrom: '#D8E3F0',
+                                colorTo: '#BED1E6',
+                                stops: [0, 100],
+                                opacityFrom: 0.4,
+                                opacityTo: 0.5,
+                            },
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                    },
+                    labels: {
+                        style: {
+                            fontSize: '11px',
+                        },
+                        formatter: function (val) {
+                            return new Date(val).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                        },
+                    }
+                },
+                yaxis: {
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false,
+                    },
+                    labels: {
+                        show: true,
+                        style: {
+                            fontSize: '11px',
+                        }
+                    },
+                },
+                tooltip: {
+                    theme: 'light',
+                    x: {
+                        formatter: function (val, opts) {
+                            return new Date(labels[opts.dataPointIndex]).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                        },
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return Math.round(val) + ' user';
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: '#e2e8f0',
+                    strokeDashArray: 5,
+                }
+            };
+
+            // Event Growth Chart
+            const eventChartOptions = {
+                series: [{
+                    name: 'Event Baru',
+                    data: eventGrowthData,
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    toolbar: {
+                        show: true,
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        dataLabels: {
+                            position: 'top',
+                        },
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val) {
+                        return Math.round(val);
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#f97316'],
+                        fontWeight: 600,
+                    },
+                },
+                colors: ['#f97316'],
+                xaxis: {
+                    categories: labels,
+                    position: 'bottom',
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false,
+                    },
+                    crosshairs: {
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                colorFrom: '#FFF1E6',
+                                colorTo: '#FFE6CC',
+                                stops: [0, 100],
+                                opacityFrom: 0.4,
+                                opacityTo: 0.5,
+                            },
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                    },
+                    labels: {
+                        style: {
+                            fontSize: '11px',
+                        },
+                        formatter: function (val) {
+                            return new Date(val).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                        },
+                    }
+                },
+                yaxis: {
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false,
+                    },
+                    labels: {
+                        show: true,
+                        style: {
+                            fontSize: '11px',
+                        }
+                    },
+                },
+                tooltip: {
+                    theme: 'light',
+                    x: {
+                        formatter: function (val, opts) {
+                            return new Date(labels[opts.dataPointIndex]).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                        },
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return Math.round(val) + ' event';
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: '#e2e8f0',
+                    strokeDashArray: 5,
+                }
+            };
+
+            console.log('Creating user chart with options:', userChartOptions);
+            const userChart = new ApexCharts(userChartEl, userChartOptions);
+            userChart.render().then(() => {
+                console.log('User chart rendered successfully');
+            }).catch(err => {
+                console.error('User chart render error:', err);
+            });
+
+            console.log('Creating event chart with options:', eventChartOptions);
+            const eventChart = new ApexCharts(eventChartEl, eventChartOptions);
+            eventChart.render().then(() => {
+                console.log('Event chart rendered successfully');
+            }).catch(err => {
+                console.error('Event chart render error:', err);
+            });
+        } catch (error) {
+            console.error('Error rendering analytics charts:', error);
+        }
+    }
+</script>
+@endpush
 @endsection

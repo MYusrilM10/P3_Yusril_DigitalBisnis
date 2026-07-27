@@ -14,10 +14,6 @@ class SmartLoginController extends Controller
      */
     public function showLoginForm()
     {
-        // Kalau sudah login, redirect otomatis sesuai role
-        if (Auth::check()) {
-            return $this->redirectByRole(Auth::user());
-        }
         return view('auth.universal-login');
     }
 
@@ -59,8 +55,8 @@ class SmartLoginController extends Controller
      */
     protected function redirectByRole(User $user)
     {
-        // 1. Superadmin
-        if ($user->isSuperadmin()) {
+        // 1. Admin / Superadmin
+        if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
 

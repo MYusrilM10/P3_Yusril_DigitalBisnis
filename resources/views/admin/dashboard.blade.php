@@ -86,6 +86,119 @@
 
 </div>
 
+<div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm mb-10">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-black text-xl">Pertumbuhan 30 Hari Terakhir</h3>
+        <p class="text-sm text-slate-500">User baru dan event baru</p>
+    </div>
+
+    <div id="growthChart" style="min-height: 400px;"></div>
+</div>
+
+@push('scripts')
+<script>
+    window.addEventListener('load', function() {
+        renderDashboardChart();
+    });
+
+    function renderDashboardChart() {
+        const labels = @json($growthLabels ?? []);
+        const userGrowthData = @json($userGrowth ?? []);
+        const eventGrowthData = @json($eventGrowth ?? []);
+
+        console.log('Chart Data:', { labels, userGrowthData, eventGrowthData });
+
+        if (!labels || labels.length === 0 || !userGrowthData || !eventGrowthData) {
+            console.error('Chart data is missing or empty');
+            return;
+        }
+
+        if (typeof ApexCharts === 'undefined') {
+            console.error('ApexCharts library not loaded');
+            return;
+        }
+
+        const chartElement = document.getElementById('growthChart');
+        if (!chartElement) {
+            console.error('Chart container not found');
+            return;
+        }
+
+        try {
+            const options = {
+                series: [
+                    {
+                        name: 'User Baru',
+                        data: userGrowthData,
+                    },
+                    {
+                        name: 'Event Baru',
+                        data: eventGrowthData,
+                    },
+                ],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    toolbar: {
+                        show: true,
+                    },
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                stroke: {
+                    curve: 'smooth',
+                },
+                colors: ['#4f46e5', '#f97316'],
+                xaxis: {
+                    categories: labels,
+                    labels: {
+                        formatter: function (val) {
+                            return new Date(val).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                        },
+                    },
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) {
+                            return Math.round(val) + ' item';
+                        },
+                    },
+                },
+                tooltip: {
+                    theme: 'light',
+                    x: {
+                        formatter: function (val, opts) {
+                            const raw = labels[opts.dataPointIndex];
+                            return new Date(raw).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                        },
+                    },
+                },
+                grid: {
+                    borderColor: '#e2e8f0',
+                    strokeDashArray: 5,
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                }
+            };
+
+            console.log('Creating chart with options:', options);
+            const chart = new ApexCharts(chartElement, options);
+            chart.render().then(() => {
+                console.log('Chart rendered successfully');
+            }).catch(err => {
+                console.error('Chart render error:', err);
+            });
+        } catch (error) {
+            console.error('Error rendering dashboard chart:', error);
+        }
+    }
+</script>
+@endpush
+
 <!-- Latest Sales Table -->
 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
 

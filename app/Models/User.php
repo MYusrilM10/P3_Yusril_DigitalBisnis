@@ -120,6 +120,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check apakah user adalah admin atau superadmin
+     */
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'superadmin'], true);
+    }
+
+    /**
      * Check apakah user adalah panitia
      */
     public function isPanitia(): bool

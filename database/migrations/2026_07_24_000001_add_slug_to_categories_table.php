@@ -30,11 +30,17 @@ return new class extends Migration
         }
 
         // Make slug unique (skip if already exists)
-        $hasUnique = collect(DB::select("SHOW INDEXES FROM categories WHERE Key_name = 'categories_slug_unique'"))->isNotEmpty();
-        if (! $hasUnique) {
+        if (DB::getDriverName() === 'sqlite') {
             Schema::table('categories', function (Blueprint $table) {
                 $table->unique('slug');
             });
+        } else {
+            $hasUnique = collect(DB::select("SHOW INDEXES FROM categories WHERE Key_name = 'categories_slug_unique'"))->isNotEmpty();
+            if (! $hasUnique) {
+                Schema::table('categories', function (Blueprint $table) {
+                    $table->unique('slug');
+                });
+            }
         }
     }
 

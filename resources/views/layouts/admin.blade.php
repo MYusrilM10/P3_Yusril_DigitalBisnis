@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <style>
@@ -85,8 +86,10 @@
                 Partner
             </a>
 
-            <div x-data="{ open: false }" class="mt-6">
-                <button @click="open = !open"
+            <div x-data="{ 
+                open: @if(Route::is('admin.tenants.*', 'admin.payouts.*', 'admin.analytics', 'admin.komisi')) true @else false @endif 
+            }" class="mt-6">
+                <button @click="open = !open; localStorage.setItem('sidebarMultiTenantOpen', open)"
                         class="w-full flex items-center justify-between gap-3 px-4 py-3 bg-transparent hover:bg-indigo-800 rounded-xl font-bold text-left">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-building w-5 h-5"></i>
@@ -138,6 +141,8 @@
         @yield('content')
 
     </main>
+
+    @stack('scripts')
 
 </body>
 

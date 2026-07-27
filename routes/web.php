@@ -7,6 +7,18 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\OrganizationRegisterController;
+use App\Http\Controllers\Organization\AuthController as OrgAuthController;
+use App\Http\Controllers\Organization\DashboardController as OrgDashboardController;
+use App\Http\Controllers\SmartLoginController;
+use App\Http\Controllers\Organization\EventController as OrgEventController;
+use App\Http\Controllers\Organization\AnalyticsController as OrgAnalyticsController;
+use App\Http\Controllers\Organization\PayoutController as OrgPayoutController;
+use App\Http\Controllers\Organization\StaffController as OrgStaffController;
+use App\Http\Controllers\Admin\TenantController as AdminTenantController;
+use App\Http\Controllers\Admin\PayoutApprovalController as AdminPayoutApprovalController;
+use App\Http\Controllers\Admin\GlobalAnalyticsController as AdminGlobalAnalyticsController;
+use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
@@ -47,24 +59,73 @@ Route::get('/my-reviews', [ReviewController::class, 'myReviews'])->name('reviews
 Route::get('/events/{event}/rating-stats', [ReviewController::class, 'getRatingStats'])->name('rating.stats');
 Route::get('/events/{event}/review-status', [ReviewController::class, 'getReviewStatus'])->name('review.status');
 
+// Public review form (via email token, no login required)
+Route::get('/rate/{order_id}', [ReviewController::class, 'showPublicForm'])->name('review.public');
+Route::post('/rate/{order_id}', [ReviewController::class, 'submitPublic'])->name('review.public.submit');
+
 Route::post('/midtrans/callback', [\App\Http\Controllers\MidtransWebhookController::class, 'handle']);
 
 // Google SSO (Laravel Socialite)
 Route::get('/auth/google',          [SocialAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'callback'])->name('auth.google.callback');
 
-// Global login route for authentication middleware
-Route::redirect('/login', '/admin/login')->name('login');
+// =============================================
+// MULTI-TENANT: PENDAFTARAN KEPANITIAAN
+// =============================================
+Route::get('/jadi-penyelenggara',  [OrganizationRegisterController::class, 'showForm'])->name('organization.register');
+Route::post('/jadi-penyelenggara', [OrganizationRegisterController::class, 'register'])->name('organization.register.submit');
+Route::get('/pendaftaran-diterima', [OrganizationRegisterController::class, 'pending'])->name('organization.pending');
+
+// Katalog kepanitiaan (public) -- redirect to unified login (removed public katalog page)
+Route::get('/panitia', function () {
+    return redirect()->route('login');
+})->name('panitia.index');
+Route::get('/panitia/{slug}', [App\Http\Controllers\PublicOrganizationController::class, 'show'])->name('panitia.show');
+
+// =============================================
+// MULTI-TENANT: PANITIA LOGIN & DASHBOARD
+// =============================================
+
+// Global logout (untuk semua role)
+Route::post('/logout', [SmartLoginController::class, 'logout'])->name('logout');
+
+Route::prefix('panitia/{slug}')->name('panitia.')->group(function () {
+    // Logout (any user)
+    Route::post('/logout', [OrgAuthController::class, 'logout'])->name('logout');
+
+    // Protected
+    Route::middleware(['auth', 'org.access'])->group(function () {
+        Route::get('/dashboard', [OrgDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/events', [OrgEventController::class, 'index'])->name('events.index');
+        Route::get('/events/create', [OrgEventController::class, 'create'])->name('events.create');
+        Route::post('/events', [OrgEventController::class, 'store'])->name('events.store');
+        Route::get('/events/{event}/edit', [OrgEventController::class, 'edit'])->name('events.edit');
+        Route::put('/events/{event}', [OrgEventController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}', [OrgEventController::class, 'destroy'])->name('events.destroy');
+        Route::get('/analytics', [OrgAnalyticsController::class, 'index'])->name('analytics');
+        Route::get('/payouts', [OrgPayoutController::class, 'index'])->name('payouts');
+        Route::post('/payouts', [OrgPayoutController::class, 'store'])->name('payouts.store');
+        Route::get('/staff', [OrgStaffController::class, 'index'])->name('staff');
+        Route::post('/staff/invite', [OrgStaffController::class, 'invite'])->name('staff.invite');
+        Route::delete('/staff/{user}', [OrgStaffController::class, 'destroy'])->name('staff.destroy');
+    });
+});
+
+// Universal Smart Login (gantikan /panitia/{slug}/login)
+Route::get('/login',  [SmartLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [SmartLoginController::class, 'login'])->name('login.post');
+
+// Dev-only: force logout (bersihkan session, abaikan redirect)
+Route::get('/force-logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('force.logout');
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-
-    Route::post('login', [AuthController::class, 'login'])->name('login.post');
-
     Route::middleware(['auth', 'admin'])->group(function () {
-
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -135,6 +196,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])
             ->name('transactions.index');
+
+        // MULTI-TENANT: Tenant Management (URL langsung, tanpa /tenants prefix)
+        Route::get('/tenants', [AdminTenantController::class, 'index'])->name('tenants.index');
+        Route::get('/pending', [AdminTenantController::class, 'pending'])->name('tenants.pending');
+        Route::get('/tenants/{id}', [AdminTenantController::class, 'show'])->name('tenants.show');
+        Route::post('/tenants/{id}/approve', [AdminTenantController::class, 'approve'])->name('tenants.approve');
+        Route::post('/tenants/{id}/reject', [AdminTenantController::class, 'reject'])->name('tenants.reject');
+        Route::post('/tenants/{id}/suspend', [AdminTenantController::class, 'suspend'])->name('tenants.suspend');
+        Route::post('/tenants/{id}/activate', [AdminTenantController::class, 'activate'])->name('tenants.activate');
+
+        // MULTI-TENANT: Payout Approval
+        Route::get('/payouts', [AdminPayoutApprovalController::class, 'index'])->name('payouts.index');
+        Route::post('/payouts/{id}/approve', [AdminPayoutApprovalController::class, 'approve'])->name('payouts.approve');
+        Route::post('/payouts/{id}/reject', [AdminPayoutApprovalController::class, 'reject'])->name('payouts.reject');
+
+        // MULTI-TENANT: Global Analytics & Komisi
+        Route::get('/analytics', [AdminGlobalAnalyticsController::class, 'index'])->name('analytics');
+        Route::get('/komisi', [AdminCommissionController::class, 'index'])->name('komisi');
+        Route::post('/komisi/{id}', [AdminCommissionController::class, 'update'])->name('komisi.update');
 
     });
 

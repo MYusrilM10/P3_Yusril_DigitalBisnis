@@ -371,4 +371,112 @@ class ReviewController extends Controller
         
         return implode(' ', $parts);
     }
+
+    // =============================================
+    // PUBLIC REVIEW (Tanpa Login, via Email Token)
+    // =============================================
+
+    /**
+     * Tampilkan form review publik berdasarkan order_id + token
+     */
+    public function showPublicForm(Request $request, string $orderId)
+    {
+        $token = $request->query('token');
+
+        $transaction = Transaction::with('event')
+            ->where('order_id', $orderId)
+            ->firstOrFail();
+
+        // Validasi token HMAC
+        $expected = $transaction->review_token;
+        if (! $expected || ! hash_equals($expected, (string) $token)) {
+            abort(403, 'Link review tidak valid atau sudah kedaluwarsa.');
+        }
+
+        // Validasi status transaksi
+        if (! in_array(strtolower((string) $transaction->status), ['success', 'settlement'])) {
+            return redirect()->route('events.show', $transaction->event)
+                ->with('error', 'Transaksi Anda belum berhasil.');
+        }
+
+        // Validasi tanggal event (sudah lewat)
+        $eventDate = \Carbon\Carbon::parse($transaction->event->date);
+        if (now()->lt($eventDate)) {
+            return redirect()->route('events.show', $transaction->event)
+                ->with('warning', 'Ulasan baru dapat diberikan setelah acara selesai.');
+        }
+
+        // Sudah pernah review? (cek termasuk soft-deleted agar tidak duplikat)
+        $existing = Review::withTrashed()->where('transaction_id', $transaction->id)->first();
+        if ($existing) {
+            return redirect()->route('events.show', $transaction->event)
+                ->with('info', 'Anda sudah memberikan ulasan untuk acara ini.');
+        }
+
+        return view('reviews.public', [
+            'transaction' => $transaction,
+            'event'       => $transaction->event,
+            'token'       => $token,
+        ]);
+    }
+
+    /**
+     * Submit review publik (tanpa login)
+     */
+    public function submitPublic(Request $request, string $orderId)
+    {
+        $token = $request->input('token');
+
+        $transaction = Transaction::with('event')
+            ->where('order_id', $orderId)
+            ->firstOrFail();
+
+        // Validasi token
+        $expected = $transaction->review_token;
+        if (! $expected || ! hash_equals($expected, (string) $token)) {
+            abort(403, 'Link review tidak valid.');
+        }
+
+        // Validasi status & tanggal (sama seperti di form)
+        if (! in_array(strtolower((string) $transaction->status), ['success', 'settlement'])) {
+            return back()->with('error', 'Transaksi Anda belum berhasil.');
+        }
+        if (now()->lt(\Carbon\Carbon::parse($transaction->event->date))) {
+            return back()->with('error', 'Acara belum selesai, ulasan belum dapat diberikan.');
+        }
+        if (Review::withTrashed()->where('transaction_id', $transaction->id)->exists()) {
+            return back()->with('error', 'Anda sudah memberikan ulasan untuk acara ini.');
+        }
+
+        $data = $request->validate([
+            'rating'      => 'required|integer|min:1|max:5',
+            'title'       => 'nullable|string|max:255',
+            'review_text' => 'nullable|string|min:10',
+        ]);
+
+        try {
+            $review = Review::create([
+                'user_id'              => $transaction->user_id, // bisa null untuk guest
+                'customer_name'        => $transaction->customer_name,
+                'customer_email'       => $transaction->customer_email,
+                'event_id'             => $transaction->event_id,
+                'transaction_id'       => $transaction->id,
+                'rating'               => $data['rating'],
+                'title'                => $data['title'] ?? null,
+                'review_text'          => $data['review_text'] ?? null,
+                'is_verified_purchase' => true,
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            return back()->with('error', 'Anda sudah memberikan ulasan untuk acara ini.');
+        } catch (\Exception $e) {
+            \Log::error('Gagal menyimpan review publik: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        }
+
+        // Recalculate event rating
+        $this->updateEventRating($transaction->event);
+
+        return redirect()->route('events.show', $transaction->event)
+            ->with('success', 'Terima kasih atas ulasan Anda! Ulasan Anda akan tampil di halaman event dan profil penyelenggara.');
+    }
 }

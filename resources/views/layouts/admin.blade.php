@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <style>
         body {
@@ -84,18 +85,47 @@
                 Partner
             </a>
 
+            <div x-data="{ open: false }" class="mt-6">
+                <button @click="open = !open"
+                        class="w-full flex items-center justify-between gap-3 px-4 py-3 bg-transparent hover:bg-indigo-800 rounded-xl font-bold text-left">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-building w-5 h-5"></i>
+                        <span>Multi-Tenant</span>
+                    </div>
+                    <i :class="open ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="w-4 h-4 text-indigo-200"></i>
+                </button>
+
+                <div x-show="open" x-transition class="mt-2 space-y-1 pl-6">
+                    <a href="{{ route('admin.tenants.index') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-indigo-800 rounded-xl font-medium text-indigo-100">
+                        <i class="fa-solid fa-building w-4 h-4"></i> Tenant
+                    </a>
+                    <a href="{{ route('admin.tenants.pending') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-indigo-800 rounded-xl font-medium text-indigo-100">
+                        <i class="fa-solid fa-clock w-4 h-4"></i> Pending
+                    </a>
+                    <a href="{{ route('admin.payouts.index') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-indigo-800 rounded-xl font-medium text-indigo-100">
+                        <i class="fa-solid fa-money-bill-wave w-4 h-4"></i> Payouts
+                    </a>
+                    <a href="{{ route('admin.analytics') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-indigo-800 rounded-xl font-medium text-indigo-100">
+                        <i class="fa-solid fa-chart-line w-4 h-4"></i> Analytics
+                    </a>
+                    <a href="{{ route('admin.komisi') }}" class="flex items-center gap-3 px-4 py-2 hover:bg-indigo-800 rounded-xl font-medium text-indigo-100">
+                        <i class="fa-solid fa-percent w-4 h-4"></i> Komisi
+                    </a>
+                </div>
+            </div>
+
         </nav>
 
         <!-- Logout -->
         <div class="pt-6 border-t border-indigo-800">
 
-            <a href="/"
-                class="flex items-center gap-3 px-4 py-3 text-indigo-300 hover:text-white font-medium">
-
-                <i class="fa-solid fa-arrow-right-from-bracket w-5 h-5"></i>
-
-                Keluar
-            </a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-indigo-300 hover:text-white font-medium text-left">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5 h-5"></i>
+                    Keluar
+                </button>
+            </form>
 
         </div>
 

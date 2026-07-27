@@ -41,7 +41,7 @@
                                     bg-blue-100 text-blue-800
                                 @endif">
                                 @if($transaction->event_finished)
-                                    ✓ Acara Selesai
+                                    <i class="fa-solid fa-circle-check text-green-500"></i> Acara Selesai
                                 @else
                                     ⏱ Acara Berlangsung
                                 @endif
@@ -64,7 +64,7 @@
                                 @else
                                     <a href="{{ route('reviews.create', $transaction->event) }}" 
                                        class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition text-sm font-medium">
-                                        ⭐ Beri Rating
+                                        <i class="fa-solid fa-star text-yellow-400"></i> Beri Rating
                                     </a>
                                 @endif
                             @endif
@@ -96,7 +96,7 @@
         </div>
     @else
         <div class="bg-gray-50 rounded-lg p-12 text-center">
-            <div class="text-6xl mb-4">🎫</div>
+            <div class="text-6xl mb-4"><i class="fa-solid fa-ticket text-indigo-200"></i></div>
             <h2 class="text-2xl font-semibold text-gray-800 mb-2">Belum Ada Tiket</h2>
             <p class="text-gray-600 mb-6">Anda belum membeli tiket apapun. Jelajahi acara menarik sekarang!</p>
             <a href="{{ route('home') }}" class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">

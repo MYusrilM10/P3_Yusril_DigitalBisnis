@@ -8,6 +8,7 @@ class Event extends Model
 {
     protected $fillable = [
         'category_id',
+        'organization_id',
         'title',
         'description',
         'date',
@@ -30,6 +31,22 @@ class Event extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Relationship: Event has many transactions (BARU)
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get successful transactions only
+     */
+    public function successfulTransactions()
+    {
+        return $this->hasMany(Transaction::class)->where('status', 'success');
     }
 
     /**
@@ -65,5 +82,17 @@ class Event extends Model
             ->where('is_verified_purchase', true)
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    // ============================================
+    // MULTI-TENANT (BARU)
+    // ============================================
+
+    /**
+     * Event ini milik organization yang mana
+     */
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
     }
 }

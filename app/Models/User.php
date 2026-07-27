@@ -86,5 +86,77 @@ class User extends Authenticatable
     {
         return $this->average_rating >= 4.5;
     }
+
+    // ============================================
+    // MULTI-TENANT RELATIONS (BARU)
+    // ============================================
+
+    /**
+     * Organizations yang user ini jadi anggotanya
+     */
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class, 'organization_user')
+            ->withPivot('role', 'invited_at', 'joined_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Organization yang user miliki (sebagai owner)
+     */
+    public function ownedOrganizations()
+    {
+        return $this->belongsToMany(Organization::class, 'organization_user')
+            ->wherePivot('role', 'owner')
+            ->withPivot('role', 'invited_at', 'joined_at');
+    }
+
+    /**
+     * Check apakah user adalah superadmin
+     */
+    public function isSuperadmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    /**
+     * Check apakah user adalah panitia
+     */
+    public function isPanitia(): bool
+    {
+        return $this->role === 'panitia';
+    }
+
+    /**
+     * Check apakah user adalah owner dari org tertentu
+     */
+    public function isOwnerOf(int $organizationId): bool
+    {
+        return $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->wherePivot('role', 'owner')
+            ->exists();
+    }
+
+    /**
+     * Check apakah user adalah anggota org tertentu
+     */
+    public function isMemberOf(int $organizationId): bool
+    {
+        return $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->exists();
+    }
+
+    /**
+     * Get role user dalam org tertentu
+     */
+    public function roleIn(int $organizationId)
+    {
+        $pivot = $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->first()?->pivot;
+        return $pivot ? $pivot->role : null;
+    }
 }
 

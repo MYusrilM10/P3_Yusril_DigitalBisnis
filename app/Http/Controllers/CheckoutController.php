@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Services\ReviewInvitationService;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EventTicketMail;
 
 class CheckoutController extends Controller
 {
@@ -33,14 +38,38 @@ class CheckoutController extends Controller
         $totalPrice = $event->price + 5000; // Menambahkan biaya admin (dummy)
 
         // 4. Merekam Transaksi ke Database
+        $commissionPercentage = $event->organization?->commission_percentage ?? 10.00;
+        $platformFee = (int) round($totalPrice * ($commissionPercentage / 100));
+        $netIncome = $totalPrice - $platformFee;
+
+        // 4a. Auto-register / attach user berdasarkan email customer
+        // Catatan: akun tetap dibuat untuk konsistensi data (user_id di transaction),
+        // tapi password tidak ditampilkan ke user karena review tidak perlu login.
+        $user = User::where('email', $request->customer_email)->first();
+        if (! $user) {
+            $user = User::create([
+                'name'     => $request->customer_name,
+                'email'    => $request->customer_email,
+                'password' => Hash::make(Str::random(20)),
+                'role'     => 'user',
+            ]);
+        } else {
+            // pastikan user_id selalu ter-attach walau customer isi email既存 user
+            $user->name = $request->customer_name;
+            $user->save();
+        }
+
         $transaction = Transaction::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'event_id' => $event->id,
+            'organization_id' => $event->organization_id,
             'order_id' => $orderId,
             'customer_name' => $request->customer_name,
             'customer_email' => $request->customer_email,
             'customer_phone' => $request->customer_phone,
             'total_price' => $totalPrice,
+            'platform_fee' => $platformFee,
+            'net_income' => $netIncome,
             'status' => 'pending', // Status awal transaksi
         ]);
 
@@ -92,6 +121,13 @@ class CheckoutController extends Controller
         $categories = \App\Models\Category::all();
 
         $transaction = Transaction::with('event')->where('order_id', $order_id)->firstOrFail();
+        // Hapus session password lama kalau ada (cleanup)
+        session()->pull('new_user_passwords.' . $order_id);
+
+        // Trigger: kalau event sudah lewat, kirim email undangan review
+        if (in_array(strtolower((string) $transaction->status), ['success', 'settlement'])) {
+            ReviewInvitationService::sendIfDue($transaction);
+        }
         
         // Konfigurasi Midtrans untuk mengecek status transaksi langsung ke API
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');

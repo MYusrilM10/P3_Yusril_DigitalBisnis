@@ -41,7 +41,9 @@
                 </div>
                 <span class="text-sm font-semibold text-gray-700">{{ $review->rating }}/5</span>
                 @if($review->is_verified_purchase)
-                    <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">✓ Pembeli Terverifikasi</span>
+                    <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full inline-flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check"></i> Pembeli Terverifikasi
+                    </span>
                 @endif
             </div>
 
@@ -58,7 +60,7 @@
             <!-- Helpful Section -->
             <div class="pt-3 border-t border-gray-100">
                 <button class="text-sm text-gray-500 hover:text-gray-700 transition">
-                    👍 Membantu ({{ $review->helpful_count }})
+                    <i class="fa-solid fa-thumbs-up"></i> Membantu ({{ $review->helpful_count }})
                 </button>
             </div>
         </div>

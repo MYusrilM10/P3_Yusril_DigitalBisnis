@@ -7,6 +7,7 @@
     <title>AmikomEventHub - Temukan Event Seru!</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -33,9 +34,12 @@
             <span class="text-xl font-bold tracking-tight">AmikomEventHub</span>
         </div>
         <div class="hidden md:flex gap-8 font-medium">
-            <a href="#" class="text-indigo-600">Jelajahi</a>
-            <a href="#" class="hover:text-indigo-600 transition">Kategori</a>
-            <a href="#" class="hover:text-indigo-600 transition">Tentang Kami</a>
+            <a href="{{ route('home') }}" class="text-indigo-600">Jelajahi</a>
+            @auth
+                @if(auth()->user()->isSuperadmin())
+                <a href="{{ route('admin.dashboard') }}" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm">Admin</a>
+                @endif
+            @endauth
         </div>
     </nav>
 

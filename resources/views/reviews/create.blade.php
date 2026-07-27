@@ -33,7 +33,7 @@
         <!-- Info Box -->
         <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p class="text-sm text-blue-800">
-                <strong>💡 Tips:</strong> Tuliskan pengalaman jujur Anda. Review yang terverifikasi dari pembeli akan membantu calon peserta membuat keputusan yang tepat.
+                <strong><i class="fa-solid fa-lightbulb text-yellow-500"></i> Tips:</strong> Tuliskan pengalaman jujur Anda. Review yang terverifikasi dari pembeli akan membantu calon peserta membuat keputusan yang tepat.
             </p>
         </div>
     </div>

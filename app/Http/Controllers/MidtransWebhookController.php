@@ -69,5 +69,12 @@ class MidtransWebhookController extends Controller
         } else {
             \Log::warning('Stock habis setelah pembayaran berhasil (Perlu proses refund opsional). Order: ' . $transaction->order_id);
         }
+
+        // Trigger email review jika event sudah lewat
+        try {
+            \App\Services\ReviewInvitationService::sendIfDue($transaction);
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email review: ' . $e->getMessage());
+        }
     }
 }

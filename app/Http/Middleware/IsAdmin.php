@@ -10,11 +10,11 @@ class IsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->role === 'admin') {
+        if (auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin'])) {
             return $next($request);
         }
 
-        return redirect()->route('admin.login')->with('error', 'Akses ditolak. Anda tidak memiliki hak akses sebagai admin.');
+        return redirect()->route('login')->with('error', 'Akses ditolak. Anda tidak memiliki hak akses sebagai admin.');
     }
 }
 

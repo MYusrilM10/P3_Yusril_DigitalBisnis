@@ -66,29 +66,43 @@
                     $isActiveAll = !request('category');
                 @endphp
                 <a href="/"
-                    class="inline-flex items-center px-6 py-3 font-semibold text-sm tracking-wide rounded-2xl transition-all duration-300 transform whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 leading-none
-                    {{ $isActiveAll 
-                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-1' 
-                        : 'bg-white text-slate-600 border border-slate-300 hover:border-indigo-400 hover:shadow-md hover:text-indigo-600 hover:-translate-y-0.5' 
+                    class="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm tracking-wide rounded-2xl transition-all duration-300 transform whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 leading-none
+                    {{ $isActiveAll
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-1'
+                        : 'bg-white text-slate-600 border border-slate-300 hover:border-indigo-400 hover:shadow-md hover:text-indigo-600 hover:-translate-y-0.5'
                     }}">
+                    <i class="fa-solid fa-layer-group"></i>
                     <span>Semua</span>
+                    <span class="px-2 py-0.5 text-[10px] font-black rounded-full {{ $isActiveAll ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500' }}">{{ \App\Models\Event::where('date', '>=', now())->count() }}</span>
                 </a>
                 @foreach($categories as $cat)
                     @php
                         $isActive = request('category') === $cat->slug;
+                        $catCount = \App\Models\Event::where('category_id', $cat->id)->where('date', '>=', now())->count();
                     @endphp
                     <a href="?category={{ $cat->slug }}"
-                        class="inline-flex items-center px-6 py-3 font-semibold text-sm tracking-wide rounded-2xl transition-all duration-300 transform whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 leading-none
-                        {{ $isActive 
-                            ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-1' 
-                            : 'bg-white text-slate-600 border border-slate-300 hover:border-indigo-400 hover:shadow-md hover:text-indigo-600 hover:-translate-y-0.5' 
+                        class="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm tracking-wide rounded-2xl transition-all duration-300 transform whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 leading-none
+                        {{ $isActive
+                            ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-1'
+                            : 'bg-white text-slate-600 border border-slate-300 hover:border-indigo-400 hover:shadow-md hover:text-indigo-600 hover:-translate-y-0.5'
                         }}">
+                        @if(strtolower($cat->name) === 'seminar')
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        @elseif(str_contains(strtolower($cat->name), 'enterta') || str_contains(strtolower($cat->name), 'hiburan') || str_contains(strtolower($cat->name), 'concert'))
+                            <i class="fa-solid fa-music"></i>
+                        @elseif(strtolower($cat->name) === 'workshop')
+                            <i class="fa-solid fa-wrench"></i>
+                        @else
+                            <i class="fa-solid fa-tag"></i>
+                        @endif
                         <span>{{ $cat->name }}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-black rounded-full {{ $isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500' }}">{{ $catCount }}</span>
                     </a>
                 @endforeach
             </div>
         </div>
 
+        @if($events->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($events as $event)
                 <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
@@ -125,7 +139,168 @@
                 </div>
             @endforeach
         </div>
+        @else
+        <div class="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-sm mb-4">
+                <i class="fa-solid fa-calendar-xmark text-3xl text-slate-300"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-700 mb-2">Belum Ada Event di Kategori Ini</h3>
+            <p class="text-slate-500 mb-6 max-w-md mx-auto">
+                @if(request('category'))
+                    Tidak ada event upcoming dengan kategori <strong>{{ $categories->firstWhere('slug', request('category'))?->name ?? request('category') }}</strong>.
+                @else
+                    Belum ada event yang akan datang. Silakan cek kembali nanti.
+                @endif
+            </p>
+            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition">
+                <i class="fa-solid fa-arrow-left"></i> Lihat Semua Event
+            </a>
+        </div>
+        @endif
     </section>
+
+    <!-- Penyelenggara Section (Carousel) -->
+    @if(isset($organizations) && $organizations->count() > 0)
+    <section class="max-w-7xl mx-auto px-6 py-20">
+        <style>
+            .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+        </style>
+
+        <!-- Section Header -->
+        <div class="mb-12 text-center">
+            <div class="inline-block mb-3">
+                <span class="inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-widest border border-indigo-100">
+                    <span class="w-2 h-2 bg-indigo-600 rounded-full mr-2"></span>
+                    Penyelenggara
+                </span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-black mb-3">
+                Kenali <span class="text-indigo-600">Penyelenggara</span> Kami
+            </h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">
+                Organisasi-organisasi yang telah mempercayai AmikomEventHub untuk mengelola event mereka.
+            </p>
+        </div>
+
+        <!-- Carousel Container -->
+        <div class="relative" x-data="{ scrollContainer: null }" x-init="scrollContainer = $refs.carousel">
+            <!-- Tombol Panah Kiri -->
+            <button @click="scrollContainer.scrollBy({left: -340, behavior: 'smooth'})"
+                    class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 bg-white border-2 border-slate-200 rounded-full items-center justify-center shadow-lg hover:border-indigo-600 hover:bg-indigo-50 transition">
+                <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+
+            <!-- Tombol Panah Kanan -->
+            <button @click="scrollContainer.scrollBy({left: 340, behavior: 'smooth'})"
+                    class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 bg-white border-2 border-slate-200 rounded-full items-center justify-center shadow-lg hover:border-indigo-600 hover:bg-indigo-50 transition">
+                <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
+            <!-- Carousel Items (Horizontal Scroll) -->
+            <div x-ref="carousel" class="flex gap-6 overflow-x-auto scroll-smooth scrollbar-hide pb-4 px-2 snap-x snap-mandatory">
+                @foreach($organizations as $org)
+                <a href="{{ route('panitia.show', $org->slug) }}"
+                   class="group flex-shrink-0 w-80 snap-start bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-2xl hover:border-indigo-600 transition-all duration-300 cursor-pointer">
+
+                    <!-- Foto Organisasi (Setengah Layar Card) -->
+                    <div class="relative h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
+                        @if($org->logo_path)
+                            <img src="{{ asset('storage/' . $org->logo_path) }}" alt="{{ $org->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        @else
+                            <!-- Pattern/Initial sebagai fallback -->
+                            <div class="w-full h-full flex items-center justify-center">
+                                <span class="text-7xl font-black text-white/30 group-hover:scale-110 transition duration-500">
+                                    {{ strtoupper(substr($org->name, 0, 2)) }}
+                                </span>
+                            </div>
+                        @endif
+
+                        <!-- Overlay tipis -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+
+                        <!-- Badge Tipe di pojok -->
+                        <span class="absolute top-3 right-3 inline-block px-2 py-1 bg-white/90 backdrop-blur text-indigo-600 text-[10px] font-bold uppercase tracking-wider rounded-full">
+                            {{ ucfirst($org->type) }}
+                        </span>
+                    </div>
+
+                    <!-- Konten Bawah Foto -->
+                    <div class="p-5">
+                        <h3 class="text-lg font-black mb-1 line-clamp-1 group-hover:text-indigo-600 transition">
+                            {{ $org->name }}
+                        </h3>
+                        <p class="text-xs text-slate-500 line-clamp-2">
+                            {{ $org->description ?? 'Penyelenggara event terpercaya di AmikomEventHub' }}
+                        </p>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Penjelasan + Ajakan Join -->
+        <div class="mt-16 max-w-3xl mx-auto text-center bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-10 md:p-12 shadow-2xl">
+            <h2 class="text-2xl md:text-3xl font-black mb-3 text-white">
+                Punya Organisasi atau Kepanitiaan?
+            </h2>
+            <p class="text-indigo-100 mb-6 leading-relaxed">
+                Kelola event & tiket Anda sendiri dengan dashboard profesional, mulai dari buat event, terima pembayaran otomatis via Midtrans, hingga tarik dana hasil penjualan. Gratis untuk kepanitiaan kampus.
+            </p>
+            <a href="{{ route('organization.register') }}"
+               class="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-50 hover:shadow-2xl hover:scale-105 transition-all">
+                <span>Ayo Jadi Penyelenggara</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </a>
+        </div>
+    </section>
+    @endif
+
+    <!-- Ulasan & Rating Terbaru -->
+    @if(isset($latestReviews) && $latestReviews->count() > 0)
+    <section class="max-w-7xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-1.5 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-star mr-1"></i> Ulasan & Rating
+            </span>
+            <h2 class="text-4xl md:text-5xl font-extrabold mt-4 mb-3">Apa Kata Peseta?</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">Ulasan asli dari peserta yang sudah mengikuti acara di AmikomEventHub.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($latestReviews as $review)
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition">
+                <div class="flex items-center gap-1 text-yellow-400 mb-3">
+                    @for($i = 1; $i <= 5; $i++)
+                        <i class="fa-solid fa-star {{ $i <= $review->rating ? '' : 'opacity-25' }}"></i>
+                    @endfor
+                </div>
+                @if($review->title)
+                <h3 class="font-black text-slate-900 mb-2">{{ $review->title }}</h3>
+                @endif
+                <p class="text-slate-600 text-sm leading-relaxed line-clamp-4 mb-4">
+                    "{{ $review->review_text }}"
+                </p>
+                <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
+                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-black text-sm">
+                        {{ strtoupper(substr($review->customer_name ?? ($review->user->name ?? 'U'), 0, 1)) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm text-slate-900 truncate">{{ $review->customer_name ?? ($review->user->name ?? 'Anonim') }}</p>
+                        <p class="text-xs text-slate-500 truncate">Event: {{ $review->event->title ?? '-' }}</p>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </section>
+    @endif
 
     <!-- Partners Section -->
     @if($partners->count() > 0)
@@ -223,6 +398,13 @@
                     <li><a href="#" class="hover:text-white transition">Home</a></li>
                     <li><a href="#" class="hover:text-white transition">Semua Event</a></li>
                     <li><a href="#" class="hover:text-white transition">Cara Bayar</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Penyelenggara</h4>
+                <ul class="space-y-4">
+                    <li><a href="{{ route('panitia.index') }}" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-building w-4 h-4"></i> Daftar Kepanitiaan</a></li>
+                    <li><a href="{{ route('organization.register') }}" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-user-plus w-4 h-4"></i> Jadi Penyelenggara</a></li>
                 </ul>
             </div>
             <div>

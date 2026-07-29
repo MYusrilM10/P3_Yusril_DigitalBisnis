@@ -63,8 +63,8 @@
                         <p class="text-red-500 text-sm font-medium">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <!-- Password Input -->
+                
+                <!-- Password Inputan -->
                 <div class="space-y-2">
                     <label for="password" class="block text-sm font-bold text-slate-700">
                         <i class="fas fa-lock mr-2 text-indigo-600"></i>Password

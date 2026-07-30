@@ -14,6 +14,13 @@
                 <p class="text-slate-500 text-sm">Masuk ke akun AmikomEventHub Anda</p>
             </div>
 
+            @if(session('notice'))
+            <div class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-indigo-600"></i>
+                <p class="text-indigo-700 text-sm font-medium">{{ session('notice') }}</p>
+            </div>
+            @endif
+
             @if(session('error'))
             <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
                 <p class="text-red-600 text-sm font-medium">• {{ session('error') }}</p>

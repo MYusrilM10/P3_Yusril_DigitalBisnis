@@ -72,8 +72,8 @@ class SmartLoginController extends Controller
                 ->with('error', 'Anda belum terhubung ke organisasi manapun.');
         }
 
-        // 3. User biasa → ke home
-        return redirect()->route('home')
+        // 3. User biasa → balik ke halaman yang dituju sebelum diminta login (mis. checkout), atau home
+        return redirect()->intended(route('home'))
             ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 }

@@ -68,11 +68,19 @@
                         </p>
                     </div>
                     <div>
-                        <a href="{{ url('checkout/' . $event->id) }}"
-                            class="inline-flex items-center gap-2 px-10 py-5 bg-white text-indigo-600 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-xl">
-                            <i class="fa-solid fa-shopping-cart w-6 h-6"></i>
-                            Pesan Sekarang
-                        </a>
+                        @if($hasPurchased)
+                            <a href="{{ url('checkout/' . $event->id) }}"
+                                class="inline-flex items-center gap-2 px-10 py-5 bg-green-500 text-white rounded-2xl font-black text-xl hover:scale-105 hover:bg-green-600 transition-all shadow-xl">
+                                <i class="fa-solid fa-circle-check w-6 h-6"></i>
+                                Sudah Dipesan • Pesan Lagi?
+                            </a>
+                        @else
+                            <a href="{{ url('checkout/' . $event->id) }}"
+                                class="inline-flex items-center gap-2 px-10 py-5 bg-white text-indigo-600 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-xl">
+                                <i class="fa-solid fa-shopping-cart w-6 h-6"></i>
+                                Pesan Sekarang
+                            </a>
+                        @endif
                     </div>
                 </div>
                 {{-- Decoration --}}

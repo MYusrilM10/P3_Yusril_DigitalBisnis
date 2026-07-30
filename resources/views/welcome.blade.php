@@ -248,7 +248,7 @@
                     <!-- Foto Organisasi (Setengah Layar Card) -->
                     <div class="relative h-20 sm:h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
                         @if($org->logo_path)
-                            <img src="{{ asset('storage/' . $org->logo_path) }}" alt="{{ $org->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <img src="{{ asset('assets/' . $org->logo_path) }}" alt="{{ $org->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         @else
                             <!-- Pattern/Initial sebagai fallback -->
                             <div class="w-full h-full flex items-center justify-center">

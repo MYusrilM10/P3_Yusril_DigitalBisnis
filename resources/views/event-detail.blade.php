@@ -11,7 +11,7 @@
                     <h4 class="font-bold mb-4">Penyelenggara</h4>
                     <div class="flex items-center gap-4">
                         @if($event->organization?->logo_path)
-                            <img src="{{ asset('storage/' . $event->organization->logo_path) }}"
+                            <img src="{{ asset('assets/' . $event->organization->logo_path) }}"
                                  alt="{{ $event->organization->name }}"
                                  class="w-12 h-12 rounded-full object-cover">
                         @else

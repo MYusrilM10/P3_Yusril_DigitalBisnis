@@ -8,6 +8,13 @@
         </svg>
     </div>
     <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Pendaftaran Diterima!</h1>
+
+    @if(session('info'))
+    <div class="mb-6 p-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl text-indigo-700 font-medium text-left">
+        {{ session('info') }}
+    </div>
+    @endif
+
     <p class="text-slate-500 text-lg mb-8">Pengajuan kepanitiaan Anda sedang diverifikasi oleh tim AmikomEventHub. Kami akan mengirim notifikasi ke email PIC dalam 1-2 hari kerja.</p>
 
     <div class="bg-white rounded-3xl shadow-xl p-8 text-left space-y-4">

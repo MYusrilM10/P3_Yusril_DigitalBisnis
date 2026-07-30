@@ -60,13 +60,23 @@ class SmartLoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        // 2. Panitia → cek org pertama yang dia jadi owner/staff
+        // 2. Panitia → cek org yang dia jadi owner/staff
         if ($user->isPanitia()) {
-            $firstOrg = $user->organizations()->first();
-            if ($firstOrg) {
-                session(['current_organization_id' => $firstOrg->id]);
-                return redirect()->route('panitia.dashboard', $firstOrg->slug);
+            // Prioritaskan org yang udah aktif (disetujui admin)
+            $activeOrg = $user->organizations()->where('status', 'active')->first();
+            if ($activeOrg) {
+                session(['current_organization_id' => $activeOrg->id]);
+                return redirect()->route('panitia.dashboard', $activeOrg->slug);
             }
+
+            // Org masih pending approval → jangan redirect ke dashboard (bakal 404
+            // kena OrganizationAccess middleware), arahin ke halaman status pending
+            $pendingOrg = $user->organizations()->first();
+            if ($pendingOrg) {
+                return redirect()->route('organization.pending')
+                    ->with('info', 'Organisasi "' . $pendingOrg->name . '" Anda masih menunggu verifikasi admin.');
+            }
+
             // Panitia tapi belum ada org (edge case)
             return redirect()->route('home')
                 ->with('error', 'Anda belum terhubung ke organisasi manapun.');

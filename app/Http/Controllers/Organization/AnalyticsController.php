@@ -22,14 +22,24 @@ class AnalyticsController extends Controller
             ->orderBy('date')
             ->get();
 
-        // 12 bulan
+        // 12 bulan (di-group di PHP, bukan raw SQL, biar jalan di SQLite maupun MySQL)
         $last12months = $org->transactions()
             ->where('status', 'success')
             ->where('created_at', '>=', Carbon::now()->subMonths(12))
-            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count, SUM(net_income) as revenue')
-            ->groupBy('year', 'month')
-            ->orderBy('year')->orderBy('month')
-            ->get();
+            ->get(['created_at', 'net_income'])
+            ->groupBy(fn ($trx) => $trx->created_at->format('Y-m'))
+            ->map(function ($group, $key) {
+                [$year, $month] = explode('-', $key);
+
+                return (object) [
+                    'year' => (int) $year,
+                    'month' => (int) $month,
+                    'count' => $group->count(),
+                    'revenue' => $group->sum('net_income'),
+                ];
+            })
+            ->sortBy(fn ($row) => sprintf('%04d%02d', $row->year, $row->month))
+            ->values();
 
         // Transactions
         $transactions = $org->transactions()

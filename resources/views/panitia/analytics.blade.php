@@ -2,6 +2,8 @@
 
 @section('content')
 <x-back-button :href="route('panitia.dashboard', $org->slug)" label="Kembali ke Dashboard" />
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- 30 days revenue chart -->
         <div class="bg-white rounded-2xl shadow-sm border p-6">
             <h2 class="text-lg font-black mb-4 flex items-center gap-2">
@@ -48,6 +50,7 @@
         <h2 class="text-lg font-black p-6 border-b flex items-center gap-2">
             <i class="fa-solid fa-receipt text-indigo-600"></i> Transaksi
         </h2>
+        <div class="overflow-x-auto">
         <table class="w-full">
             <thead class="bg-slate-50">
                 <tr>
@@ -76,6 +79,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
     <div class="mt-6">{{ $transactions->links() }}</div>
 @endsection

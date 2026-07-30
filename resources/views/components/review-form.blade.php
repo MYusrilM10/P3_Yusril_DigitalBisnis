@@ -51,7 +51,7 @@
                 class="w-full px-4 py-3.5 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-slate-800 placeholder-slate-400"
                 placeholder="Bagikan pengalaman menarik atau masukan membangun Anda tentang acara ini...">{{ isset($review) ? $review->review_text : '' }}</textarea>
             <div class="flex items-center justify-between mt-2.5">
-                <small class="text-slate-450 font-medium text-xs">Ulasan yang bermanfaat membantu calon peserta
+                <small class="text-slate-400 font-medium text-xs">Ulasan yang bermanfaat membantu calon peserta
                     lainnya</small>
                 <span class="text-xs font-bold text-slate-400" id="charCount">0 karakter</span>
             </div>
@@ -63,12 +63,12 @@
         <!-- Submit Button -->
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <button type="submit"
-                class="px-8 py-3.5 bg-indigo-650 hover:bg-indigo-700 active:scale-98 text-white rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-lg shadow-indigo-100/70 transition-all">
+                class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-lg shadow-indigo-100/70 transition-all">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
                 {{ isset($review) ? 'Simpan Perubahan' : 'Kirim Ulasan' }}
             </button>
             <a href="{{ route('events.show', $event) }}"
-                class="px-8 py-3.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm transition-all">
+                class="px-8 py-3.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm transition-all">
                 Batal
             </a>
         </div>
@@ -89,7 +89,7 @@
             stars.forEach((star, index) => {
                 const currentStarNum = index + 1;
                 if (currentStarNum <= rating) {
-                    star.classList.remove('text-slate-202', 'scale-100');
+                    star.classList.remove('text-slate-200', 'scale-100');
                     star.classList.add('text-amber-400');
                 } else {
                     star.classList.remove('text-amber-400');
@@ -140,7 +140,7 @@
                     charCount.classList.add('text-rose-500');
                 } else if (count >= 10) {
                     charCount.classList.remove('text-slate-400', 'text-rose-500');
-                    charCount.classList.add('text-emerald-650');
+                    charCount.classList.add('text-emerald-600');
                 } else {
                     charCount.classList.remove('text-rose-500', 'text-emerald-600');
                     charCount.classList.add('text-slate-400');

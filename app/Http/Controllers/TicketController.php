@@ -27,7 +27,7 @@ class TicketController extends Controller
             $now = Carbon::now();
             
             $transaction->event_finished = $now->isAfter($eventDate);
-            $transaction->can_review = $transaction->event_finished && Carbon::now()->diffInHours($eventDate) >= 12;
+            $transaction->can_review = $transaction->event_finished && abs(Carbon::now()->diffInHours($eventDate)) >= 12;
             $transaction->has_review = $transaction->review != null;
             
             return $transaction;

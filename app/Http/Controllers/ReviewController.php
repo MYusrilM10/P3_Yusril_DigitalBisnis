@@ -73,7 +73,7 @@ class ReviewController extends Controller
         }
 
         // Event sudah dimulai, tapi belum H+12 jam
-        $hoursSinceEvent = $now->diffInHours($eventDate);
+        $hoursSinceEvent = abs($now->diffInHours($eventDate));
         if ($hoursSinceEvent < 12) {
             $nextReviewDate = $eventDate->copy()->addHours(12);
             $timeRemaining = $this->formatTimeDifference($now, $nextReviewDate);
@@ -307,7 +307,7 @@ class ReviewController extends Controller
             ]);
         }
 
-        $hoursSince = $now->diffInHours($eventDate);
+        $hoursSince = abs($now->diffInHours($eventDate));
         if ($hoursSince < 12) {
             $nextReviewDate = $eventDate->copy()->addHours(12);
             $timeRemaining = $this->formatTimeDifference($now, $nextReviewDate);
@@ -351,7 +351,7 @@ class ReviewController extends Controller
      */
     private function formatTimeDifference($from, $to)
     {
-        $totalMinutes = $from->diffInMinutes($to);
+        $totalMinutes = abs($from->diffInMinutes($to));
         
         $days = intdiv($totalMinutes, 24 * 60);
         $remainingMinutes = $totalMinutes % (24 * 60);

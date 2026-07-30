@@ -67,8 +67,8 @@ class PlatformDummySeeder extends Seeder
 
         // Bikin org pending (belum approve) jika belum ada
         $pendingOrgDefs = [
-            ['slug' => 'ukm-fotografi', 'name' => 'UKM Fotografi Amikom', 'desc' => 'Unit Kegiatan Mahasiswa Fotografi Universitas Amikom Yogyakarta.'],
-            ['slug' => 'komunitas-robotika', 'name' => 'Komunitas Robotika Amikom', 'desc' => 'Komunitas mahasiswa yang bergerak di bidang robotika dan IoT.'],
+            ['slug' => 'ukm-basket-amikom', 'name' => 'UKM Basket Amikom', 'type' => 'ukm', 'desc' => 'Unit Kegiatan Mahasiswa Basket Universitas Amikom Yogyakarta.'],
+            ['slug' => 'komunitas-film-amikom', 'name' => 'Komunitas Film Amikom', 'type' => 'ukm', 'desc' => 'Komunitas mahasiswa yang bergerak di bidang perfilman dan videografi.'],
         ];
         $pendingOrgs = [];
         foreach ($pendingOrgDefs as $i => $def) {
@@ -77,7 +77,7 @@ class PlatformDummySeeder extends Seeder
                 ['slug' => $def['slug']],
                 [
                     'name' => $def['name'],
-                    'type' => 'ukm',
+                    'type' => $def['type'],
                     'description' => $def['desc'],
                     'email' => "{$def['slug']}@amikom.ac.id",
                     'phone' => "081234567{$i}00",
@@ -103,8 +103,8 @@ class PlatformDummySeeder extends Seeder
 
         // Bikin org active dengan approval
         $activeOrgDefs = [
-            ['slug' => 'panitia-amikom-festival', 'name' => 'Panitia Amikom Festival', 'desc' => 'Panitia penyelenggara Amikom Festival, acara tahunan kampus.'],
-            ['slug' => 'panitia-wisuda-amikom', 'name' => 'Panitia Wisuda Amikom', 'desc' => 'Panitia penyelenggara acara wisuda dan seremoni kampus.'],
+            ['slug' => 'mayapala-amikom', 'name' => 'Mayapala', 'type' => 'ukm', 'desc' => 'Unit Kegiatan Mahasiswa Pecinta Alam Universitas Amikom Yogyakarta.'],
+            ['slug' => 'hmif-amikom', 'name' => 'HMIF', 'type' => 'hima', 'desc' => 'Himpunan Mahasiswa Informatika Universitas Amikom Yogyakarta.'],
         ];
         $activeOrgs = [];
         foreach ($activeOrgDefs as $i => $def) {
@@ -113,7 +113,7 @@ class PlatformDummySeeder extends Seeder
                 ['slug' => $def['slug']],
                 [
                     'name' => $def['name'],
-                    'type' => 'kepanitiaan',
+                    'type' => $def['type'],
                     'description' => $def['desc'],
                     'email' => "{$def['slug']}@amikom.ac.id",
                     'phone' => "081234567{$i}11",

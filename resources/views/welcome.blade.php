@@ -21,7 +21,7 @@
                     <i class="fa-solid fa-arrow-right w-5 h-5"></i>
                     Mulai Jelajah
                 </a>
-                <a href="#"
+                <a href="#cara-pesan"
                     class="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-lg hover:border-indigo-600 hover:text-indigo-600 transition flex items-center gap-2">
                     <i class="fa-solid fa-circle-info w-5 h-5"></i>
                     Cara Pesan
@@ -163,6 +163,40 @@
         @endif
     </section>
 
+    <!-- Cara Pesan -->
+    <section id="cara-pesan" class="max-w-7xl mx-auto px-6 py-20">
+        <div class="mb-12 text-center">
+            <span class="inline-block px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold uppercase tracking-wider mb-4">
+                Panduan
+            </span>
+            <h2 class="text-3xl md:text-4xl font-black mb-3">Cara Pesan Tiket</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">4 langkah gampang buat dapetin tiket event impianmu.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 text-center">
+                <div class="w-12 h-12 mx-auto mb-4 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-xl">1</div>
+                <h3 class="font-bold mb-2">Pilih Event</h3>
+                <p class="text-sm text-slate-500">Jelajahi & pilih event yang kamu mau ikuti.</p>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 text-center">
+                <div class="w-12 h-12 mx-auto mb-4 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-xl">2</div>
+                <h3 class="font-bold mb-2">Login & Isi Data</h3>
+                <p class="text-sm text-slate-500">Masuk ke akunmu, lengkapi data pemesan di halaman checkout.</p>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 text-center">
+                <div class="w-12 h-12 mx-auto mb-4 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-xl">3</div>
+                <h3 class="font-bold mb-2">Bayar via Midtrans</h3>
+                <p class="text-sm text-slate-500">Pilih metode pembayaran (QRIS, VA, kartu) lewat Midtrans, aman & cepat.</p>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 text-center">
+                <div class="w-12 h-12 mx-auto mb-4 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-xl">4</div>
+                <h3 class="font-bold mb-2">Terima E-Ticket</h3>
+                <p class="text-sm text-slate-500">E-ticket otomatis dikirim ke email & bisa dilihat di halaman Tiket Saya.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Penyelenggara Section (Carousel) -->
     @if(isset($organizations) && $organizations->count() > 0)
     <section class="max-w-7xl mx-auto px-6 py-20">
@@ -214,7 +248,7 @@
                     <!-- Foto Organisasi (Setengah Layar Card) -->
                     <div class="relative h-20 sm:h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 overflow-hidden">
                         @if($org->logo_path)
-                            <img src="{{ asset('storage/' . $org->logo_path) }}" alt="{{ $org->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <img src="{{ asset('assets/' . $org->logo_path) }}" alt="{{ $org->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         @else
                             <!-- Pattern/Initial sebagai fallback -->
                             <div class="w-full h-full flex items-center justify-center">
@@ -349,7 +383,7 @@
                                     <img 
                                         src="{{ $partner->logo_url }}" 
                                         alt="{{ $partner->name }}"
-                                        class="max-h-16 max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110 drop-shadow-sm group-hover:drop-shadow-md"
+                                        class="max-h-16 max-w-full object-contain transition-all duration-500 group-hover:scale-110 drop-shadow-sm group-hover:drop-shadow-md"
                                         title="{{ $partner->name }}"
                                     >
                                 </div>
@@ -399,9 +433,9 @@
             <div>
                 <h4 class="text-white font-bold mb-6">Navigasi</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="hover:text-white transition">Home</a></li>
-                    <li><a href="#" class="hover:text-white transition">Semua Event</a></li>
-                    <li><a href="#" class="hover:text-white transition">Cara Bayar</a></li>
+                    <li><a href="{{ route('home') }}" class="hover:text-white transition">Home</a></li>
+                    <li><a href="{{ route('home') }}#events" class="hover:text-white transition">Semua Event</a></li>
+                    <li><a href="{{ route('home') }}#cara-pesan" class="hover:text-white transition">Cara Bayar</a></li>
                 </ul>
             </div>
             <div>

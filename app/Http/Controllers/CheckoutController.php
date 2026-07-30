@@ -16,12 +16,22 @@ class CheckoutController extends Controller
 {
     public function create(Event $event)
     {
+        if (! auth()->check()) {
+            return redirect()->guest(route('login'))
+                ->with('notice', 'Silakan login terlebih dahulu sebelum melakukan pemesanan.');
+        }
+
         return view('checkout', compact('event'));
     }
 
     public function store(Request $request, Event $event)
     {
-        // 1. Validasi Input kredensial Pelanggan 
+        if (! auth()->check()) {
+            return redirect()->guest(route('login'))
+                ->with('notice', 'Silakan login terlebih dahulu sebelum melakukan pemesanan.');
+        }
+
+        // 1. Validasi Input kredensial Pelanggan
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
